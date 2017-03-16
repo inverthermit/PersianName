@@ -7,13 +7,16 @@ public class DataFileReader {
 	public DataFileReader(String path){
 		this.path = path;
 	}*/
-	public static ArrayList<String> read(String path){
+	public static String[] read(String path){
 		
 		try{
+			int lines = getLineCount(path);
 			BufferedReader br = new BufferedReader(new FileReader(path));
-			ArrayList<String> result = new ArrayList<String>();
+			String[] result = new String[lines];
+			int count = 0;
 			while(br.ready()){
-				result.add(br.readLine());
+				result[count]=br.readLine();
+				count++;
 			}
 			br.close();
 			return result;
@@ -23,6 +26,20 @@ public class DataFileReader {
 			return null;
 		}
 		
+	}
+	
+	public static int getLineCount(String path){
+		try{
+			BufferedReader reader = new BufferedReader(new FileReader(path));
+			int lines = 0;
+			while (reader.readLine() != null) lines++;
+			reader.close();
+			return lines;
+		}
+		catch(Exception ee){
+			ee.printStackTrace();
+		}
+		return 0;
 	}
 
 }

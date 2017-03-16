@@ -11,24 +11,36 @@ import Model.Distance;
 
 import java.io.*;
 
-import jxl.write.Label;
 public class GlobalEditDistance extends AutoAlgorithm {
 	//Distance of: Match, Insert, Delete, Replace
 	
-	private int[] LevenshteinDistance = {0,1,1,1};
-	private int[] NormalDistance = {1,-1,-1,-1};
+	private final int[] LevenshteinDistance = {0,1,1,1};
+	private final int[] NormalDistance = {1,-1,-1,-1};
+	private Distance distance = new Distance(NormalDistance);
+	private String[] names = DataFileReader.read(new File(Config.PATH+Config.NAME_FILE)
+    .getAbsolutePath());
+	private String[] train = DataFileReader.read(Config.PATH+Config.TRAIN_FILE);
+	private int[] trainFlag = new int[train.length];
+	private String[][] result = new String[train.length][3];
 	@Override
 	public String getDescription() {
 		return "GlobalEditDistance";
 	}
 
 	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
 	public boolean run() {
 		// TODO Auto-generated method stub
-		Distance distance = new Distance(NormalDistance);
+		/*Distance distance = new Distance(NormalDistance);
 		ArrayList<String> names = DataFileReader.read(new File(Config.PATH+Config.NAME_FILE)
         .getAbsolutePath());
 		ArrayList<String> train = DataFileReader.read(Config.PATH+Config.TRAIN_FILE);
+		int[] trainFlag = new int[train.size()];*/
 		
 		ExecutorService pool = Executors.newCachedThreadPool();
 		for(int tIndex=0;tIndex<Config.MAX_THREAD;tIndex++)
@@ -39,15 +51,13 @@ public class GlobalEditDistance extends AutoAlgorithm {
 				{
 					while(true)
 					{
-						String[] data= getUnhandledURL();
-						if(data!=null)
-						{
-							HashMap<String,String> DataMap=KentGetDetails(data);
-							putIntoWorkbook(DataMap,Integer.parseInt(data[0]));
-							System.out.println(data[0]+" done.");
+						int index= getUnhandledDataIndex(trainFlag);
+						if(index!=-1){
+							String[] max = getMaxScore(train[index], names, distance);
+							putIntoArray(max,index);
+							System.out.println("Done:"+index);
 						}
 						else{
-							//System.out.println("No Unhandled");
 							break;
 						}
 					}
@@ -57,28 +67,30 @@ public class GlobalEditDistance extends AutoAlgorithm {
 			});
 		}
 		pool.shutdown();
-		pool.awaitTermination(600, TimeUnit.SECONDS);
-		
-		for(int i=0;i<train.size();i++){//train.size()
-			//System.out.println(train.get(i).split("\t")[0]);
-			
-			
+		try {
+			pool.awaitTermination(600, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		
 		return true;
 	}
 	
 	public String[] getMaxScore(String str, String[] names, Distance distance){
-		int max = needlemanWunsch(train.get(i).split("\t")[0].toLowerCase(), names.get(0).toLowerCase(), distance);
+		int max = needlemanWunsch(str.split("\t")[0].toLowerCase(), names[0].toLowerCase(), distance);
 		int maxIndex = 0;
-		for(int j=1;j<names.size();j++){
-			int dis =  needlemanWunsch(train.get(i).split("\t")[0].toLowerCase(), names.get(j).toLowerCase(), distance);
+		for(int j=1;j<names.length;j++){
+			int dis =  needlemanWunsch(str.split("\t")[0].toLowerCase(), names[j].toLowerCase(), distance);
 			if(dis > max){
 				max = dis;
 				maxIndex = j;
 			}
 		}
-		System.out.println("Train:"+train.get(i)+"--Output:"+names.get(maxIndex)+"--Score:"+max);
-		return {str,names.get(maxIndex),1};
+		//System.out.println("Train:"+str+"--Output:"+names.get(maxIndex)+"--Score:"+max);
+		String[] result = {str,names[maxIndex], max+"","1"};
+		return result;
 	}
 	
 	public int needlemanWunsch(String str1, String str2, Distance distance) {
@@ -104,38 +116,24 @@ public class GlobalEditDistance extends AutoAlgorithm {
 		
 	}
 	
-	public static synchronized String[] getUnhandledURL()
+	public synchronized int getUnhandledDataIndex( int[] flags)
 	{
-		for(int i=0;i<Data.length;i++)
+		for(int i=0;i<flags.length;i++)
 		{
-			if(Data[i][Data[0].length-1].equals("0"))
+			if(flags[i]==0)
 			{
-				Data[i][Data[0].length-1]="1";
-				return Data[i];
+				flags[i]=1;
+				return i;
 			}
 		}
-		return null;
+		return -1;
 	}
 	
-	public static synchronized void putIntoArray(HashMap<String,String> data,int index)
+	public synchronized void putIntoArray(String[] data,int index)
 	{
-		String[] Keys={"School","Level","Title","Type","Application Fee","Tuition Fee",
-				"Academic Entry Requirement","IELTS Average Requirement",
-				"IELTS Lowest Requirement","Structure","Length (months)","Month of Entry",
-				"Scholarship"};
-		for(int j=0;j<13;j++)
-		{
-			//label = new Label(j, i, data.get(Keys[j]));
-		    Label label = new Label(j, index, data.get(Keys[j]));
-		    try{
-		    	sheet.addCell(label);
-		    }
-		    catch(Exception ee)
-		    {
-		    	ee.printStackTrace();
-		    }
-			
-		}
+		result[index] = data;
 	}
+
+	
 
 }

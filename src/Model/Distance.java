@@ -5,10 +5,10 @@ public class Distance {
 	public Distance(int[] distance){
 		if(distance.length == 4)
 		{
-			i = distance[0];
-			d = distance[1];
-			r = distance[2];
-			m = distance[3];
+			m = distance[0];
+			i = distance[1];
+			d = distance[2];
+			r = distance[3];
 		}
 	}
 	
@@ -26,6 +26,15 @@ public class Distance {
 	
 	public int match(){
 		return m;
+	}
+	
+	public int equal(String str1,String str2){
+		if(str1.equals(str2)){
+			return m;
+		}
+		else{
+			return r;
+		}
 	}
 
 }

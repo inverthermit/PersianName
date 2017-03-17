@@ -12,7 +12,7 @@ public class Common {
 			return max;
 		}
 		else{
-			return 0;
+			return -9999;
 		}
 		
 	}
@@ -28,7 +28,7 @@ public class Common {
 			return min;
 		}
 		else{
-			return 0;
+			return 9999;
 		}
 		
 	}

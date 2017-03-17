@@ -28,13 +28,8 @@ public class Distance {
 		return m;
 	}
 	
-	public int equal(String str1,String str2){
-		if(str1.equals(str2)){
-			return m;
-		}
-		else{
-			return r;
-		}
+	public int equal(char c1,char c2){
+		return c1==c2? m:r;
 	}
 
 }

@@ -1,5 +1,7 @@
 package Model;
 
+import tools.Common;
+
 public class Distance {
 	private int i, d, r, m;
 	public Distance(int[] distance){
@@ -30,6 +32,12 @@ public class Distance {
 	
 	public int equal(char c1,char c2){
 		return c1==c2? m:r;
+	}
+	
+	public int equalBLOSUM40(char c1, char c2){
+		int x=Common.getCharIndex(c1, Common.BLOBSUM62CHAR);
+		int y=Common.getCharIndex(c2, Common.BLOBSUM62CHAR);
+		return Common.BLOBSUM62[x][y];
 	}
 
 }

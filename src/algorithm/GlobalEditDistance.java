@@ -8,6 +8,7 @@ import tools.Common;
 import tools.Config;
 import tools.DataFileReader;
 import Model.Distance;
+import Model.Evaluation;
 
 import java.io.*;
 
@@ -15,12 +16,13 @@ public class GlobalEditDistance extends AutoAlgorithm {
 	//Distance of: Match, Insert, Delete, Replace
 	
 	private final int[] LevenshteinDistance = {0,1,1,1};
-	private final int[] NormalDistance = {1,-1,-1,-1};
+	private final int[] NormalDistance = {1,-3,-3,-3};
 	private Distance distance ;
 	private String[] names ;
 	private String[] train ;
 	private int[] trainFlag ;
 	private String[][] result ;
+	private int correctness=0;
 	@Override
 	public String getDescription() {
 		return "GlobalEditDistance";
@@ -28,24 +30,18 @@ public class GlobalEditDistance extends AutoAlgorithm {
 
 	@Override
 	public void init() {
-		// TODO Auto-generated method stub
 		distance = new Distance(NormalDistance);
 		names = DataFileReader.read(new File(Config.PATH+Config.NAME_FILE)
 	    .getAbsolutePath());
 		train = DataFileReader.read(Config.PATH+Config.TRAIN_FILE);
+		
+		
 		trainFlag = new int[train.length];
 		result = new String[train.length][3];
 	}
 	
 	@Override
 	public boolean run() {
-		// TODO Auto-generated method stub
-		/*Distance distance = new Distance(NormalDistance);
-		ArrayList<String> names = DataFileReader.read(new File(Config.PATH+Config.NAME_FILE)
-        .getAbsolutePath());
-		ArrayList<String> train = DataFileReader.read(Config.PATH+Config.TRAIN_FILE);
-		int[] trainFlag = new int[train.size()];*/
-		
 		ExecutorService pool = Executors.newCachedThreadPool();
 		for(int tIndex=0;tIndex<Config.MAX_THREAD;tIndex++)
 		{
@@ -59,6 +55,9 @@ public class GlobalEditDistance extends AutoAlgorithm {
 						if(index!=-1){
 							String[] max = getMaxScore(train[index], names, distance);
 							putIntoArray(max,index);
+							if(train[index].split("\t")[1].equals(max[1])){
+								addCorrectness();
+							}
 							System.out.println("Done:"+index);
 						}
 						else{
@@ -72,11 +71,11 @@ public class GlobalEditDistance extends AutoAlgorithm {
 		try {
 			pool.awaitTermination(600, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		
+		Evaluation eval = new Evaluation(correctness,train.length);
+		System.out.println("Accuracy:"+eval.getAccuracy());
 		return true;
 	}
 	
@@ -108,7 +107,7 @@ public class GlobalEditDistance extends AutoAlgorithm {
 				int[] input = {
 						matrix[i][j-1]+distance.delete(),
 						matrix[i-1][j]+distance.insert(),
-						matrix[i-1][j-1]+distance.equal(str1.charAt(j-1),str2.charAt(i-1))
+						matrix[i-1][j-1]+distance.equalBLOSUM40(str1.charAt(j-1),str2.charAt(i-1))
 				};
 				matrix[i][j]=Common.max(input);
 			}
@@ -160,6 +159,11 @@ public class GlobalEditDistance extends AutoAlgorithm {
 	
 	public void putIntoArray(String[] data,int index)
 	{
-		result[index] = data;
+		this.result[index] = data;
+	}
+	
+	public synchronized void addCorrectness()
+	{
+		this.correctness++;
 	}
 }

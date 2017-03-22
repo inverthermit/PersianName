@@ -53,18 +53,14 @@ public class GlobalEditDistance extends AutoAlgorithm {
 							Result max = getMaxScore(train[index], names, distance);
 							putIntoArray(max,index);
 							String trainTag =train[index].split("\t")[1];
-							while(true){
-								SingleResult sr = max.queue.poll();
-								if(sr == null){
+							Iterator<SingleResult> iterator = max.queue.iterator();
+							while (iterator.hasNext()) {
+								if(iterator.next().target.equals(trainTag)){
+									addCorrectness();
 									break;
 								}
-								else{
-									if(sr.target.equals(trainTag)){
-										addCorrectness();
-										break;
-									}
-								}
 							}
+							//System.out.println(max.queue.size());
 							System.out.println("Done:"+index);
 						}
 						else{
@@ -109,14 +105,14 @@ public class GlobalEditDistance extends AutoAlgorithm {
 			String lcName = names[j].toLowerCase();
 			int dis =  needlemanWunsch(persianName,lcName , distance);
 			if(queue.size() < Config.MAX_RESULT_ARRAY){
-				SingleResult srTemp= new SingleResult(j, persianName, lcName, queueMin);
+				SingleResult srTemp= new SingleResult(j, persianName, lcName, dis);
 				queue.add(srTemp);
 				if(dis < queueMin){
 					queueMin = dis;
 				}
 			}
 			else if(queue.size() >= Config.MAX_RESULT_ARRAY && dis>queueMin){
-				SingleResult srTemp= new SingleResult(j, persianName, lcName, queueMin);
+				SingleResult srTemp= new SingleResult(j, persianName, lcName, dis);
 				queue.poll();
 				queue.add(srTemp);
 				queueMin = queue.peek().score;

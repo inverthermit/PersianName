@@ -13,7 +13,8 @@ public class GlobalEditDistance extends AutoAlgorithm {
 	//Distance of: Match, Insert, Delete, Replace
 	
 	private final int[] LevenshteinDistance = {0,1,1,1};
-	private final int[] NormalDistance = {1,-3,-3,-3};
+	private final int[] NormalDistance = {1,-1,-1,-1};
+	private final int[] CustomizedDistance = {3,-3,-3,-3};
 	private Distance distance ;
 	private String[] names ;
 	private String[] train ;
@@ -27,7 +28,8 @@ public class GlobalEditDistance extends AutoAlgorithm {
 
 	@Override
 	public void init() {
-		distance = new Distance(NormalDistance);
+		//distance = new Distance(NormalDistance);
+		distance = new Distance(CustomizedDistance);
 		names = DataFileReader.read(new File(Config.PATH+Config.NAME_FILE)
 	    .getAbsolutePath());
 		train = DataFileReader.read(Config.PATH+Config.TRAIN_FILE);
@@ -38,7 +40,7 @@ public class GlobalEditDistance extends AutoAlgorithm {
 	}
 	
 	@Override
-	public boolean run() {
+	public Evaluation run() {
 		ExecutorService pool = Executors.newCachedThreadPool();
 		for(int tIndex=0;tIndex<Config.MAX_THREAD;tIndex++)
 		{
@@ -53,10 +55,13 @@ public class GlobalEditDistance extends AutoAlgorithm {
 							Result max = getMaxScore(train[index], names, distance);
 							putIntoArray(max,index);
 							String trainTag =train[index].split("\t")[1];
+							
 							Iterator<SingleResult> iterator = max.queue.iterator();
 							while (iterator.hasNext()) {
-								if(iterator.next().target.equals(trainTag)){
+								SingleResult sr = iterator.next();
+								if(sr.target.equals(trainTag)){
 									addCorrectness();
+									max.correctness = true;
 									break;
 								}
 							}
@@ -83,14 +88,16 @@ public class GlobalEditDistance extends AutoAlgorithm {
 					break;
 				}
 				else{
-					Log.log(i+" "+result[i].persianName+" "+sr.target+" "+sr.score);
+					Log.log(i+" "+result[i].persianName+"["+result[i].latinName+"] "+sr.target+" "+sr.score);
 				}
 			}
+			Log.log("-------------------"+result[i].correctness+"-------------------------");
 			
 		}
 		Evaluation eval = new Evaluation(correctness,train.length);
 		System.out.println("Accuracy:"+eval.getAccuracy());
-		return true;
+		resetCorrectness();
+		return eval;
 	}
 	
 	public Result getMaxScore(String str, String[] names, Distance distance){
@@ -98,13 +105,15 @@ public class GlobalEditDistance extends AutoAlgorithm {
         PriorityQueue<SingleResult> queue = 
             new PriorityQueue<SingleResult>(Config.MAX_RESULT_ARRAY, comparator);
 		String persianName = str.split("\t")[0].toLowerCase();
+		String latinName = str.split("\t")[1].toLowerCase();
 		int queueMin = needlemanWunsch(persianName, names[0].toLowerCase(), distance);
 		SingleResult sr= new SingleResult(0, persianName, names[0].toLowerCase(), queueMin);
 		queue.add(sr);
 		for(int j=1;j<names.length;j++){
 			String lcName = names[j].toLowerCase();
 			int dis =  needlemanWunsch(persianName,lcName , distance);
-			if(queue.size() < Config.MAX_RESULT_ARRAY){
+			//Log.log(persianName+" "+lcName+" "+dis);
+			/*if(queue.size() < Config.MAX_RESULT_ARRAY){
 				SingleResult srTemp= new SingleResult(j, persianName, lcName, dis);
 				queue.add(srTemp);
 				if(dis < queueMin){
@@ -116,10 +125,17 @@ public class GlobalEditDistance extends AutoAlgorithm {
 				queue.poll();
 				queue.add(srTemp);
 				queueMin = queue.peek().score;
-			}
+			}*/
+			SingleResult srTemp= new SingleResult(j, persianName, lcName, dis);
+			queue.add(srTemp);
+		}
+		PriorityQueue<SingleResult> limitedQueue = 
+	            new PriorityQueue<SingleResult>(Config.MAX_RESULT_ARRAY, comparator);
+		for( int j=0;j<Config.MAX_RESULT_ARRAY;j++){
+			limitedQueue.add(queue.poll());
 		}
 		//System.out.println("Train:"+str+"--Output:"+names[maxIndex]+"--Score:"+max);
-		Result result = new Result(persianName,queue);
+		Result result = new Result(persianName,limitedQueue,latinName);
 		
 		//String[] result = {str,names[maxIndex], max+"","1"};
 		return result;
@@ -138,7 +154,7 @@ public class GlobalEditDistance extends AutoAlgorithm {
 				int[] input = {
 						matrix[i][j-1]+distance.delete(),
 						matrix[i-1][j]+distance.insert(),
-						matrix[i-1][j-1]+distance.equal(str1.charAt(j-1),str2.charAt(i-1))
+						matrix[i-1][j-1]+distance.equalTIMMATRX(str1.charAt(j-1),str2.charAt(i-1))
 				};
 				matrix[i][j]=Common.max(input);
 			}
@@ -196,5 +212,9 @@ public class GlobalEditDistance extends AutoAlgorithm {
 	public synchronized void addCorrectness()
 	{
 		this.correctness++;
+	}
+	
+	public void resetCorrectness(){
+		this.correctness = 0;
 	}
 }

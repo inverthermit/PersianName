@@ -1,5 +1,7 @@
 package algorithm;
 
+import Model.Evaluation;
+
 public class NGram extends AutoAlgorithm {
 
 	@Override
@@ -8,9 +10,15 @@ public class NGram extends AutoAlgorithm {
 	}
 
 	@Override
-	public boolean run() {
+	public Evaluation run() {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
+	}
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

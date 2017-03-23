@@ -39,5 +39,13 @@ public class Distance {
 		int y=Common.getCharIndex(c2, Common.BLOBSUM62CHAR);
 		return Common.BLOBSUM62[x][y];
 	}
+	public int equalTIMMATRX(char c1, char c2){
+		if(c1 == c2){
+			return 3;
+		}
+		int x=Common.getCharIndex(c1, Common.TIMMATRIXCHAR);
+		int y=Common.getCharIndex(c2, Common.TIMMATRIXCHAR);
+		return Common.TIMMATRIX[x][y];
+	}
 
 }

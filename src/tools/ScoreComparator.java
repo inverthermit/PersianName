@@ -21,6 +21,6 @@ public class ScoreComparator implements Comparator<SingleResult>
             return 1;
         }
         return 0;*/
-    	return y.score - x.score;
+    	return  y.score -x.score;
     }
 }

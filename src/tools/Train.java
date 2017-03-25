@@ -17,12 +17,14 @@ public class Train {
 			int x = trainArray[i][0];
 			int y = trainArray[i][1];
 			for(int j=range[0];j<=range[1];j++){
+				int temp = matrix[x][y];
 				matrix[x][y] = j;
 				alg.init();
 				Evaluation eval = alg.run();
 				String result = "Element:{"+x+","+y+"} Value:"+j+" "+eval.getAccuracy();
 				System.out.println(result);
 				Log.log(result);
+				matrix[x][y] = temp;
 			}
 		}
 	}

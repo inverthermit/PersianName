@@ -41,7 +41,7 @@ public class Distance {
 	}
 	public int equalTIMMATRX(char c1, char c2){
 		if(c1 == c2){
-			return 3;
+			return this.m;
 		}
 		int x=Common.getCharIndex(c1, Common.TIMMATRIXCHAR);
 		int y=Common.getCharIndex(c2, Common.TIMMATRIXCHAR);

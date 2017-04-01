@@ -4,19 +4,24 @@ import java.text.*;
 import java.util.*;
 
 import tools.Common;
+import tools.Config;
 import tools.Train;
 public class Main {
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		/*AutoAlgorithm alg = new EditDistance();
+		alg.init();
+		alg.getDescription();
+		*/
 		System.out.println("ready");
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date startDate = new Date();
 		String start = (dateFormat.format(startDate));
-		AutoAlgorithm alg = new GlobalEditDistance();
-		
+		AutoAlgorithm alg = new EditDistance();
+		//AutoAlgorithm alg = new NGram();
 		alg.init();
 		alg.run();
+		
 		
 		/*int[][] trainArray={{6,17},{18,19},{10,20}};//j-h
 		int[][] matrix = Common.TIMMATRIX;

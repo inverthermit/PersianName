@@ -9,7 +9,7 @@ import Model.*;
 
 import java.io.*;
 
-public class GlobalEditDistance extends AutoAlgorithm {
+public class EditDistance extends AutoAlgorithm {
 	//Distance of: Match, Insert, Delete, Replace
 	
 	private final int[] LevenshteinDistance = {0,1,1,1};
@@ -23,13 +23,14 @@ public class GlobalEditDistance extends AutoAlgorithm {
 	private int correctness=0;
 	@Override
 	public String getDescription() {
-		return "GlobalEditDistance";
+		System.out.println(smithWaterman("aactay","zions",distance));
+		return "EditDistance";
 	}
 
 	@Override
 	public void init() {
-		//distance = new Distance(NormalDistance);
-		distance = new Distance(CustomizedDistance);
+		distance = new Distance(NormalDistance);
+		//distance = new Distance(CustomizedDistance);
 		names = DataFileReader.read(new File(Config.PATH+Config.NAME_FILE)
 	    .getAbsolutePath());
 		train = DataFileReader.read(Config.PATH+Config.TRAIN_FILE);
@@ -106,26 +107,14 @@ public class GlobalEditDistance extends AutoAlgorithm {
             new PriorityQueue<SingleResult>(Config.MAX_RESULT_ARRAY, comparator);
 		String persianName = str.split("\t")[0].toLowerCase();
 		String latinName = str.split("\t")[1].toLowerCase();
-		int queueMin = needlemanWunsch(persianName, names[0].toLowerCase(), distance);
+		int queueMin =  needlemanWunsch(persianName, names[0].toLowerCase(), distance);
+		//int queueMin = smithWaterman(persianName, names[0].toLowerCase(), distance);
 		SingleResult sr= new SingleResult(0, persianName, names[0].toLowerCase(), queueMin);
 		queue.add(sr);
 		for(int j=1;j<names.length;j++){
 			String lcName = names[j].toLowerCase();
 			int dis =  needlemanWunsch(persianName,lcName , distance);
-			//Log.log(persianName+" "+lcName+" "+dis);
-			/*if(queue.size() < Config.MAX_RESULT_ARRAY){
-				SingleResult srTemp= new SingleResult(j, persianName, lcName, dis);
-				queue.add(srTemp);
-				if(dis < queueMin){
-					queueMin = dis;
-				}
-			}
-			else if(queue.size() >= Config.MAX_RESULT_ARRAY && dis>queueMin){
-				SingleResult srTemp= new SingleResult(j, persianName, lcName, dis);
-				queue.poll();
-				queue.add(srTemp);
-				queueMin = queue.peek().score;
-			}*/
+			//int dis = smithWaterman(persianName, lcName, distance);
 			SingleResult srTemp= new SingleResult(j, persianName, lcName, dis);
 			queue.add(srTemp);
 		}
@@ -154,7 +143,8 @@ public class GlobalEditDistance extends AutoAlgorithm {
 				int[] input = {
 						matrix[i][j-1]+distance.delete(),
 						matrix[i-1][j]+distance.insert(),
-						matrix[i-1][j-1]+distance.equalTIMMATRX(str1.charAt(j-1),str2.charAt(i-1))
+						//matrix[i-1][j-1]+distance.equalTIMMATRX(str1.charAt(j-1),str2.charAt(i-1))
+						matrix[i-1][j-1]+distance.equal(str1.charAt(j-1),str2.charAt(i-1))
 				};
 				matrix[i][j]=Common.max(input);
 			}
@@ -186,6 +176,12 @@ public class GlobalEditDistance extends AutoAlgorithm {
 				}
 			}
 		}
+		/*for(int i=0;i<=lt;i++){
+			for(int j=0;j<=lf;j++){
+				System.out.print(matrix[i][j]+" ");
+			}
+			System.out.println();
+		}*/
 		return max;
 		
 		

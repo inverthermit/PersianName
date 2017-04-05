@@ -22,7 +22,7 @@ public class Main {
 		alg.init();
 		alg.run();
 		
-		
+		//Training Process
 		/*int[][] trainArray={{6,17},{18,19},{10,20}};//j-h
 		int[][] matrix = Common.TIMMATRIX;
 		int[] range = {-3,2};//{-3,2}

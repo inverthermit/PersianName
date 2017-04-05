@@ -29,8 +29,8 @@ public class EditDistance extends AutoAlgorithm {
 
 	@Override
 	public void init() {
-		distance = new Distance(NormalDistance);
-		//distance = new Distance(CustomizedDistance);
+		//distance = new Distance(NormalDistance);
+		distance = new Distance(CustomizedDistance);
 		names = DataFileReader.read(new File(Config.PATH+Config.NAME_FILE)
 	    .getAbsolutePath());
 		train = DataFileReader.read(Config.PATH+Config.TRAIN_FILE);
@@ -143,8 +143,11 @@ public class EditDistance extends AutoAlgorithm {
 				int[] input = {
 						matrix[i][j-1]+distance.delete(),
 						matrix[i-1][j]+distance.insert(),
+						matrix[i-1][j-1]+distance.equalSOUNDEXMATRIX(str1.charAt(j-1),str2.charAt(i-1))
 						//matrix[i-1][j-1]+distance.equalTIMMATRX(str1.charAt(j-1),str2.charAt(i-1))
-						matrix[i-1][j-1]+distance.equal(str1.charAt(j-1),str2.charAt(i-1))
+						//matrix[i-1][j-1]+distance.equal(str1.charAt(j-1),str2.charAt(i-1))
+						//matrix[i-1][j-1]+distance.equalBLOSUM40(str1.charAt(j-1),str2.charAt(i-1))
+						//matrix[i-1][j-1]+distance.equalBLOSUM62(str1.charAt(j-1),str2.charAt(i-1))
 				};
 				matrix[i][j]=Common.max(input);
 			}

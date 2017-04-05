@@ -75,6 +75,16 @@ public class Common {
 		{-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3,-3}
 
 	};
+	public static int[][] SOUNDEXMATRIX={
+		{3,-1,-1,-1,-1,-1,-3},
+		{-1,3,-1,-1,-1,-1,-3},
+		{-1,-1,3,-1,-1,-1,-3},
+		{-1,-1,-1,3,-1,-1,-3},
+		{-1,-1,-1,-1,3,-1,-3},
+		{-1,-1,-1,-1,-1,3,-3},
+		{-3,-3,-3,-3,-3,-3,-3}//73.43%
+	};
+	public static char[] SOUNDEXCHAR = {'a','e','i','o','u','y','*'};
 	public static char[] BLOBSUM40CHAR = {'a','r','n','d','c','q','e','g','h','i','l','k','m','f','p','s','t','w','y','v','b','z','x','*'};
 	public static char[] BLOBSUM62CHAR = {'a','r','n','d','c','q','e','g','h','i','l','k','m','f','p','s','t','w','y','v','*'};
 	public static char[] TIMMATRIXCHAR = {'a','e','i','o','u','y','v','c','g','h','j','k','q','z','f','x','s','w','f','p','d','*'};//14
